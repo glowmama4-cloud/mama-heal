@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background-color: #FDF3E7;
+  color: #111111;
+}
+
+.btn-gold {
+  @apply bg-gold text-ink font-semibold px-6 py-3 rounded-full hover:opacity-90 transition;
+}
+
+.btn-outline {
+  @apply border-2 border-ink text-ink font-semibold px-6 py-3 rounded-full hover:bg-ink hover:text-white transition;
+}
+
+.card {
+  @apply bg-white rounded-2xl shadow-sm p-6 border border-gold/20;
+}
