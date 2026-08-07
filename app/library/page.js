@@ -1,20 +1,6 @@
-const sessions = {
-  'Self-Love': [
-    { title: 'Coming Home to Yourself', desc: 'A grounding practice for rebuilding self-worth.' },
-    { title: 'You Are Not Behind', desc: 'Releasing comparison and impatience with your own timeline.' },
-    { title: 'Filling Your Own Cup First', desc: 'Why self-care is not selfish — it\'s survival.' },
-  ],
-  'Breakup Healing': [
-    { title: 'Grieving What\'s Gone', desc: 'Giving yourself permission to mourn the relationship.' },
-    { title: 'Releasing the Story You Told Yourself', desc: 'Untangling blame, shame, and "what ifs".' },
-    { title: 'Rebuilding After Heartbreak', desc: 'Practical steps to feel like yourself again.' },
-  ],
-  'Relationship & Partner Focus': [
-    { title: 'Your Children Will Leave — Your Partner Stays', desc: 'Rebalancing attention between motherhood and partnership.' },
-    { title: 'Rekindling Intimacy', desc: 'Small daily habits to keep the spark alive.' },
-    { title: 'Speaking Your Needs Without Guilt', desc: 'Healthy communication in long-term relationships.' },
-  ],
-}
+import { sessions } from '../../lib/sessions'
+
+const categories = ['Self-Love', 'Breakup Healing', 'Relationship & Partner Focus']
 
 export default function Library() {
   return (
@@ -22,19 +8,24 @@ export default function Library() {
       <h1 className="text-3xl font-serif font-bold mb-2">Healing Library</h1>
       <p className="text-ink/70 mb-10">Sessions to guide you back to yourself — and closer to the people you love.</p>
 
-      {Object.entries(sessions).map(([category, items]) => (
+      {categories.map((category) => (
         <div key={category} className="mb-12">
           <h2 className="text-xl font-serif font-bold text-gold mb-4">{category}</h2>
           <div className="grid md:grid-cols-3 gap-4">
-            {items.map((s) => (
-              <div key={s.title} className="card">
-                <h3 className="font-semibold mb-1">{s.title}</h3>
-                <p className="text-sm text-ink/70">{s.desc}</p>
-                <button className="mt-4 text-sm font-semibold text-gold hover:underline">
-                  Begin session →
-                </button>
-              </div>
-            ))}
+            {Object.entries(sessions)
+              .filter(([, s]) => s.category === category)
+              .map(([slug, s]) => (
+                <div key={slug} className="card">
+                  <h3 className="font-semibold mb-1">{s.title}</h3>
+                  <p className="text-sm text-ink/70">{s.intro.slice(0, 90)}...</p>
+                  
+                    href={`/library/${slug}`}
+                    className="mt-4 inline-block text-sm font-semibold text-gold hover:underline"
+                  >
+                    Begin session →
+                  </a>
+                </div>
+              ))}
           </div>
         </div>
       ))}
