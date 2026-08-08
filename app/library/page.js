@@ -18,7 +18,7 @@ export default function Library() {
                 <div key={slug} className="card">
                   <h3 className="font-semibold mb-1">{s.title}</h3>
                   <p className="text-sm text-ink/70">{s.intro.slice(0, 90)}...</p>
-                  
+                  <a
                     href={`/library/${slug}`}
                     className="mt-4 inline-block text-sm font-semibold text-gold hover:underline"
                   >
