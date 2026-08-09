@@ -6,16 +6,22 @@ const PAYFAST_URL =
     ? 'https://sandbox.payfast.co.za/eng/process'
     : 'https://www.payfast.co.za/eng/process'
 
+function pfEncode(value) {
+  return encodeURIComponent(value.toString().trim())
+    .replace(/%20/g, '+')
+    .replace(/[!'()*]/g, (c) => '%' + c.charCodeAt(0).toString(16).toUpperCase())
+}
+
 function buildSignature(data, passphrase) {
   let pfOutput = ''
   for (const key of Object.keys(data)) {
-    if (data[key] !== '' && data[key] !== undefined) {
-      pfOutput += `${key}=${encodeURIComponent(data[key].toString().trim()).replace(/%20/g, '+')}&`
+    if (data[key] !== '' && data[key] !== undefined && data[key] !== null) {
+      pfOutput += `${key}=${pfEncode(data[key])}&`
     }
   }
   let getString = pfOutput.slice(0, -1)
   if (passphrase) {
-    getString += `&passphrase=${encodeURIComponent(passphrase.trim()).replace(/%20/g, '+')}`
+    getString += `&passphrase=${pfEncode(passphrase)}`
   }
   return crypto.createHash('md5').update(getString).digest('hex')
 }
