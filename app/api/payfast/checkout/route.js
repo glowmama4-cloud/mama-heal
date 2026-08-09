@@ -55,6 +55,14 @@ export async function POST(request) {
     }
 
     const signature = buildSignature(data, process.env.PAYFAST_PASSPHRASE)
+    console.log('PAYFAST DEBUG:', {
+      mode: process.env.PAYFAST_MODE,
+      merchantIdSet: !!process.env.PAYFAST_MERCHANT_ID,
+      merchantKeySet: !!process.env.PAYFAST_MERCHANT_KEY,
+      passphraseSet: !!process.env.PAYFAST_PASSPHRASE,
+      passphraseLength: process.env.PAYFAST_PASSPHRASE?.length,
+      signature,
+    })
     const params = new URLSearchParams({ ...data, signature })
 
     const html = `
