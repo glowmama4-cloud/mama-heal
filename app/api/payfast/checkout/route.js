@@ -36,7 +36,9 @@ export async function POST(request) {
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.mamaglow.co.za'
     const amount = plan === 'annual' ? '3000.00' : '300.00'
 
-    // Trim every value ONCE here, so signature and posted form fields always match
+    // Field order below MUST match PayFast's required signature order:
+    // merchant details -> buyer details -> transaction details -> custom fields ->
+    // transaction options -> payment method -> recurring billing details
     const data = {
       merchant_id: (process.env.PAYFAST_MERCHANT_ID || '').trim(),
       merchant_key: (process.env.PAYFAST_MERCHANT_KEY || '').trim(),
@@ -47,11 +49,11 @@ export async function POST(request) {
       m_payment_id: `${userId}-${Date.now()}`,
       amount,
       item_name: 'Mama Heal Membership',
+      custom_str1: userId,          // moved up — must come before subscription fields
       subscription_type: '1',
       recurring_amount: amount,
       frequency: '3',
       cycles: '0',
-      custom_str1: userId,
     }
 
     const passphrase = (process.env.PAYFAST_PASSPHRASE || '').trim()
