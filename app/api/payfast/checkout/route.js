@@ -7,7 +7,7 @@ const PAYFAST_URL =
     : 'https://www.payfast.co.za/eng/process'
 
 function pfEncode(value) {
-  return encodeURIComponent(value.toString().trim())
+  return encodeURIComponent(value.toString())
     .replace(/%20/g, '+')
     .replace(/[!'()*]/g, (c) => '%' + c.charCodeAt(0).toString(16).toUpperCase())
 }
@@ -21,7 +21,7 @@ function buildSignature(data, passphrase) {
   }
   let getString = pfOutput.slice(0, -1)
   if (passphrase) {
-    getString += `&passphrase=${pfEncode(passphrase)}`
+    getString += `&passphrase=${pfEncode(passphrase.trim())}`
   }
   return crypto.createHash('md5').update(getString).digest('hex')
 }
@@ -29,7 +29,6 @@ function buildSignature(data, passphrase) {
 export async function POST(request) {
   try {
     const { userId, email, plan } = await request.json()
-
     if (!userId || !email) {
       return NextResponse.json({ error: 'Missing user info' }, { status: 400 })
     }
@@ -37,13 +36,14 @@ export async function POST(request) {
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.mamaglow.co.za'
     const amount = plan === 'annual' ? '3000.00' : '300.00'
 
+    // Trim every value ONCE here, so signature and posted form fields always match
     const data = {
-      merchant_id: process.env.PAYFAST_MERCHANT_ID,
-      merchant_key: process.env.PAYFAST_MERCHANT_KEY,
+      merchant_id: (process.env.PAYFAST_MERCHANT_ID || '').trim(),
+      merchant_key: (process.env.PAYFAST_MERCHANT_KEY || '').trim(),
       return_url: `${siteUrl}/dashboard?payment=success`,
       cancel_url: `${siteUrl}/pricing?payment=cancelled`,
       notify_url: `${siteUrl}/api/payfast/notify`,
-      email_address: email,
+      email_address: email.trim(),
       m_payment_id: `${userId}-${Date.now()}`,
       amount,
       item_name: 'Mama Heal Membership',
@@ -54,17 +54,18 @@ export async function POST(request) {
       custom_str1: userId,
     }
 
-    const signature = buildSignature(data, process.env.PAYFAST_PASSPHRASE)
+    const passphrase = (process.env.PAYFAST_PASSPHRASE || '').trim()
+    const signature = buildSignature(data, passphrase)
+
     console.log('PAYFAST DEBUG:', {
       mode: process.env.PAYFAST_MODE,
-      merchantIdSet: !!process.env.PAYFAST_MERCHANT_ID,
-      merchantKeySet: !!process.env.PAYFAST_MERCHANT_KEY,
-      passphraseSet: !!process.env.PAYFAST_PASSPHRASE,
-      passphraseLength: process.env.PAYFAST_PASSPHRASE?.length,
+      merchantIdPreview: data.merchant_id.slice(0, 4) + '...' + data.merchant_id.slice(-2),
+      merchantKeySet: !!data.merchant_key,
+      passphraseLength: passphrase.length,
       signature,
     })
-    const params = new URLSearchParams({ ...data, signature })
 
+    const params = new URLSearchParams({ ...data, signature })
     const html = `
       <html><body onload="document.forms[0].submit()">
         <form action="${PAYFAST_URL}" method="post">
@@ -74,7 +75,6 @@ export async function POST(request) {
         </form>
       </body></html>
     `
-
     return new NextResponse(html, { headers: { 'Content-Type': 'text/html' } })
   } catch (err) {
     return NextResponse.json({ error: err.message }, { status: 500 })
