@@ -32,7 +32,7 @@ export default function Signup() {
   return (
     <div className="max-w-sm mx-auto px-6 py-20">
       <h1 className="text-2xl font-serif font-bold mb-2 text-center">Begin your healing</h1>
-      <p className="text-center text-sm text-ink/60 mb-6">5 days free. Then R300/month.</p>
+      <p className="text-center text-sm text-ink/60 mb-6">5 days free. Then R150/month.</p>
       <form onSubmit={handleSignup} className="space-y-4">
         <input
           type="email" placeholder="Email" value={email}
