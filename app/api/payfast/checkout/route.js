@@ -34,7 +34,7 @@ export async function POST(request) {
     }
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.mamaglow.co.za'
-    const amount = plan === 'annual' ? '3000.00' : '300.00'
+    const amount = plan === 'annual' ? '1500.00' : '150.00'
 
     // Field order below MUST match PayFast's required signature order:
     // merchant details -> buyer details -> transaction details -> custom fields ->
